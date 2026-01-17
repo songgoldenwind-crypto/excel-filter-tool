@@ -9,6 +9,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from openpyxl import load_workbook, Workbook
 from openpyxl.utils import get_column_letter
+import openpyxl
 import os
 import sys
 
@@ -148,8 +149,13 @@ class ExcelFilterTool:
             self.file_entry.insert(0, file_path)
 
             try:
-                # 加载工作簿
-                self.workbook = load_workbook(file_path, data_only=True)
+                # 加载工作簿 - 使用更保守的方式
+                self.workbook = openpyxl.load_workbook(file_path, data_only=True)
+
+                # 验证workbook对象
+                if not hasattr(self.workbook, 'sheetnames'):
+                    raise Exception(f"workbook对象类型错误: {type(self.workbook)}")
+
                 self.sheet_names = self.workbook.sheetnames
 
                 # 更新Sheet下拉框
