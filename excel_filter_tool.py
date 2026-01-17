@@ -7,9 +7,10 @@ Excel数据筛选工具
 
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 from openpyxl.utils import get_column_letter
 import os
+import sys
 
 
 class ExcelFilterTool:
@@ -295,11 +296,16 @@ class ExcelFilterTool:
                         target_sheet.cell(row=row_idx, column=col_idx, value=value)
 
             # 自动保存到原文件
-            self.workbook.save(self.file_path)
-            self.result_workbook = None  # 已保存，不需要再保存
-            self.update_status(f"筛选完成！共找到 {len(filtered_rows) - 1} 行数据，已保存到文件")
-
-            messagebox.showinfo("成功", f"筛选完成！\n共找到 {len(filtered_rows) - 1} 行符合条件的数据\n已自动保存到原文件\n目标Sheet: {target_sheet_name}")
+            try:
+                self.workbook.save(self.file_path)
+                self.result_workbook = None  # 已保存，不需要再保存
+                self.update_status(f"筛选完成！共找到 {len(filtered_rows) - 1} 行数据，已保存到文件")
+                messagebox.showinfo("成功", f"筛选完成！\n共找到 {len(filtered_rows) - 1} 行符合条件的数据\n已自动保存到原文件\n目标Sheet: {target_sheet_name}")
+            except Exception as save_error:
+                # 如果保存失败，尝试另存为
+                messagebox.showwarning("保存失败", f"无法保存到原文件: {str(save_error)}\n\n请点击'保存结果'按钮另存为新文件")
+                self.result_workbook = self.workbook
+                self.update_status(f"筛选完成！共找到 {len(filtered_rows) - 1} 行数据，请保存结果")
 
         except Exception as e:
             messagebox.showerror("错误", f"执行筛选失败: {str(e)}")
