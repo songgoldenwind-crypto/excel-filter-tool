@@ -294,10 +294,12 @@ class ExcelFilterTool:
                     for col_idx, value in enumerate(row_data, start=1):
                         target_sheet.cell(row=row_idx, column=col_idx, value=value)
 
-            self.result_workbook = self.workbook
-            self.update_status(f"筛选完成！共找到 {len(filtered_rows) - 1} 行数据")
+            # 自动保存到原文件
+            self.workbook.save(self.file_path)
+            self.result_workbook = None  # 已保存，不需要再保存
+            self.update_status(f"筛选完成！共找到 {len(filtered_rows) - 1} 行数据，已保存到文件")
 
-            messagebox.showinfo("成功", f"筛选完成！\n共找到 {len(filtered_rows) - 1} 行符合条件的数据\n已追加到Sheet: {target_sheet_name}")
+            messagebox.showinfo("成功", f"筛选完成！\n共找到 {len(filtered_rows) - 1} 行符合条件的数据\n已自动保存到原文件\n目标Sheet: {target_sheet_name}")
 
         except Exception as e:
             messagebox.showerror("错误", f"执行筛选失败: {str(e)}")
